@@ -1104,6 +1104,29 @@
             localStorage.setItem('foodDiaryEntries', JSON.stringify(entries));
         }
 
+        // Format foods with amounts in a readable way
+        function formatFoodsWithAmounts(foods, amounts) {
+            const foodArray = Array.isArray(foods) ? foods : (foods || '').toString().split('\n').filter(f => f.trim());
+            const amountArray = Array.isArray(amounts) ? amounts : (amounts || '').toString().split('\n').filter(a => a.trim());
+            
+            const formattedItems = [];
+            
+            for (let i = 0; i < foodArray.length; i++) {
+                const food = foodArray[i];
+                const amount = amountArray[i];
+                
+                if (food) {
+                    if (amount && amount.trim()) {
+                        formattedItems.push(`${food} (${amount})`);
+                    } else {
+                        formattedItems.push(food);
+                    }
+                }
+            }
+            
+            return formattedItems.join(', ');
+        }
+
         // Load today's entries
         function loadTodaysEntries() {
             const date = document.getElementById('currentDate').value;
@@ -1122,11 +1145,7 @@
                     <div class="entry-details">
                         <div class="entry-detail">
                             <span class="entry-label">🍽️ Ruoat:</span>
-                            <div class="entry-value">${Array.isArray(entry.foods) ? entry.foods.join(', ') : (entry.foods || '').replace(/\n/g, ', ')}</div>
-                        </div>
-                        <div class="entry-detail">
-                            <span class="entry-label">📏 Määrät:</span>
-                            <div class="entry-value">${Array.isArray(entry.amounts) ? entry.amounts.join(', ') : (entry.amounts || '').replace(/\n/g, ', ')}</div>
+                            <div class="entry-value">${formatFoodsWithAmounts(entry.foods, entry.amounts)}</div>
                         </div>
                         ${entry.hungerBefore ? `<div class="entry-detail">
                             <span class="entry-label">😋 Nälkä:</span>
@@ -1375,13 +1394,19 @@
                 csvContent += '\n';
                 
                 // CSV headers
-                csvContent += 'Aika,Paikka,Ruoka/Juoma,Määrä,Nälkä ennen,Kylläisyys jälkeen,Tunteet,Oireet\n';
+                csvContent += 'Aika,Paikka,Ruuat ja juomat,Määrä,Nälän aste/tunteet,Oireet\n';
                 
                 if (entries[date]) {
                     const sortedEntries = entries[date].sort((a, b) => a.time.localeCompare(b.time));
                     sortedEntries.forEach(entry => {
                         const foods = Array.isArray(entry.foods) ? entry.foods : (entry.foods || '').toString().split('\n').filter(f => f.trim());
                         const amounts = Array.isArray(entry.amounts) ? entry.amounts : (entry.amounts || '').toString().split('\n').filter(a => a.trim());
+                        
+                        // Combine hunger/fullness and feelings
+                        const hungerInfo = [];
+                        if (entry.hungerBefore) hungerInfo.push(`Nälkä: ${entry.hungerBefore}/10`);
+                        if (entry.fullnessAfter) hungerInfo.push(`Kylläisyys: ${entry.fullnessAfter}/10`);
+                        if (entry.feelings) hungerInfo.push(entry.feelings);
                         
                         // Ensure we have at least one food item
                         if (foods.length === 0) foods.push('');
@@ -1393,9 +1418,7 @@
                                 i === 0 ? entry.location : '',
                                 `"${food.trim()}"`,
                                 `"${amount.trim()}"`,
-                                i === 0 ? (entry.hungerBefore || '') : '',
-                                i === 0 ? (entry.fullnessAfter || '') : '',
-                                i === 0 ? `"${entry.feelings || ''}"` : '',
+                                i === 0 ? `"${hungerInfo.join(', ')}"` : '',
                                 i === 0 ? `"${entry.symptoms || ''}"` : ''
                             ];
                             csvContent += row.join(',') + '\n';
@@ -1413,7 +1436,7 @@
         // Export all to CSV
         function exportAll() {
             try {
-                let csvContent = 'Päivämäärä,Viikonpäivä,Aika,Paikka,Ruoka/Juoma,Määrä,Nälkä ennen,Kylläisyys jälkeen,Tunteet,Oireet\n';
+                let csvContent = 'Päivämäärä,Viikonpäivä,Aika,Paikka,Ruuat ja juomat,Määrä,Nälän aste/tunteet,Oireet\n';
                 
                 Object.keys(entries).sort().forEach(date => {
                     const sortedEntries = entries[date].sort((a, b) => a.time.localeCompare(b.time));
@@ -1421,6 +1444,12 @@
                     sortedEntries.forEach(entry => {
                         const foods = Array.isArray(entry.foods) ? entry.foods : (entry.foods || '').toString().split('\n').filter(f => f.trim());
                         const amounts = Array.isArray(entry.amounts) ? entry.amounts : (entry.amounts || '').toString().split('\n').filter(a => a.trim());
+                        
+                        // Combine hunger/fullness and feelings
+                        const hungerInfo = [];
+                        if (entry.hungerBefore) hungerInfo.push(`Nälkä: ${entry.hungerBefore}/10`);
+                        if (entry.fullnessAfter) hungerInfo.push(`Kylläisyys: ${entry.fullnessAfter}/10`);
+                        if (entry.feelings) hungerInfo.push(entry.feelings);
                         
                         // Ensure we have at least one food item
                         if (foods.length === 0) foods.push('');
@@ -1434,9 +1463,7 @@
                                 i === 0 ? entry.location : '',
                                 `"${food.trim()}"`,
                                 `"${amount.trim()}"`,
-                                i === 0 ? (entry.hungerBefore || '') : '',
-                                i === 0 ? (entry.fullnessAfter || '') : '',
-                                i === 0 ? `"${entry.feelings || ''}"` : '',
+                                i === 0 ? `"${hungerInfo.join(', ')}"` : '',
                                 i === 0 ? `"${entry.symptoms || ''}"` : ''
                             ];
                             csvContent += row.join(',') + '\n';
