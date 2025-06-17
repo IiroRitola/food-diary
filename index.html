@@ -2,15 +2,55 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Ruokapäiväkirja">
+    <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#4CAF50">
     <title>Ruokapäiväkirja</title>
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,eyJ2ZXJzaW9uIjoiMS4wIiwibmFtZSI6IlJ1b2thcMOkaXbDpGtpcmphIiwic2hvcnRfbmFtZSI6IlJ1b2thbG9naSIsImRlc2NyaXB0aW9uIjoiSGVua2nDtmtvaHRhaW5lbiBydW9rYXDDpGl2w6RraXJqYSIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzY2N2VlYSIsInRoZW1lX2NvbG9yIjoiIzRDQUY1MCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBNE1EZ2dPREE0SWlCbWFXeHNQU0lqTkVOQlJqVXdJajQ4ZEdWNGRDQjRQU0kzTVNJZ2VUMGlOamtpSUdacGJHdzlJaU0yTmpZaUlHWnZiblF0YzJsNlpUMGlOelZsZVNJZ2RHVjRkQzFoYm1Ob2IzSTlJbTFwWkdSc1pTSStVblZ2YTJGd1c2UjVzTVdpcWFwc1p5NDRQQ3gwWlhoMFBpd3ZkR1Y0ZEQ0OEwzTjJaejQ9IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjgwOHg4MDgifV19">
+    <link rel="manifest" href="data:application/json;charset=utf-8,{
+        &quot;name&quot;: &quot;Ruokapäiväkirja&quot;,
+        &quot;short_name&quot;: &quot;Ruokalogi&quot;,
+        &quot;description&quot;: &quot;Henkilökohtainen ruokapäiväkirja&quot;,
+        &quot;start_url&quot;: &quot;./?utm_source=pwa&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;orientation&quot;: &quot;portrait&quot;,
+        &quot;background_color&quot;: &quot;#667eea&quot;,
+        &quot;theme_color&quot;: &quot;#4CAF50&quot;,
+        &quot;categories&quot;: [&quot;health&quot;, &quot;lifestyle&quot;],
+        &quot;lang&quot;: &quot;fi&quot;,
+        &quot;dir&quot;: &quot;ltr&quot;,
+        &quot;scope&quot;: &quot;./&quot;,
+        &quot;launch_handler&quot;: {
+            &quot;client_mode&quot;: &quot;navigate-existing&quot;
+        },
+        &quot;icons&quot;: [
+            {
+                &quot;src&quot;: &quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%234CAF50'%3E%3Ctext x='256' y='350' font-size='320' text-anchor='middle'%3E🍽️%3C/text%3E%3C/svg%3E&quot;,
+                &quot;type&quot;: &quot;image/svg+xml&quot;,
+                &quot;sizes&quot;: &quot;any&quot;,
+                &quot;purpose&quot;: &quot;any maskable&quot;
+            },
+            {
+                &quot;src&quot;: &quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%234CAF50' rx='20'/%3E%3Ctext x='96' y='140' font-size='100' text-anchor='middle'%3E🍽️%3C/text%3E%3C/svg%3E&quot;,
+                &quot;type&quot;: &quot;image/svg+xml&quot;,
+                &quot;sizes&quot;: &quot;192x192&quot;
+            },
+            {
+                &quot;src&quot;: &quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%234CAF50' rx='50'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle'%3E🍽️%3C/text%3E%3C/svg%3E&quot;,
+                &quot;type&quot;: &quot;image/svg+xml&quot;,
+                &quot;sizes&quot;: &quot;512x512&quot;
+            }
+        ]
+    }">
+    
+    <!-- Preload hints for PWA performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDggODA4IiBmaWxsPSIjNENBRjUwIj48dGV4dCB4PSI3MSIgeT0iNjkiIGZpbGw9IiM2NjYiIGZvbnQtc2l6ZT0iNzVleSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UnVva2FwW6R5c1decWphPC90ZXh0Pjwvc3ZnPg==">
@@ -1317,7 +1357,7 @@
             }
         }
 
-        // Initialize the application with storage detection
+        // Legacy function - now split into smaller parts for better PWA performance
         async function initializeApp() {
             try {
                 console.log('Initializing food diary app...');
@@ -1553,29 +1593,117 @@
             }
         }
 
-        // Enhanced app initialization
+        // Enhanced app initialization with PWA performance optimizations
         async function fullInitialize() {
+            // Show loading state immediately for PWA
+            const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            
+            if (isPWA) {
+                showPWALoader();
+            }
+            
             // Check password first
             if (!checkPassword()) {
                 document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;">🔒 Pääsy evätty</div>';
                 return;
             }
             
-            await initializeApp();
-            await registerServiceWorker();
+            // Fast UI initialization first
+            initializeDateSync();
+            setCurrentTime();
+            setupEventListeners();
             
-            // Auto-backup reminder (weekly)
-            const lastBackup = localStorage.getItem('lastBackupReminder');
-            const now = Date.now();
-            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            if (isPWA) {
+                hidePWALoader();
+            }
             
-            if (!lastBackup || (now - parseInt(lastBackup)) > oneWeek) {
-                setTimeout(() => {
-                    if (Object.keys(entries).length > 0) {
-                        showMessage('💾 Muista viedä varmuuskopio iCloud Driveen!', 'info', 5000);
-                        localStorage.setItem('lastBackupReminder', now.toString());
-                    }
-                }, 10000); // Show after 10 seconds
+            // Lazy load heavy operations
+            setTimeout(async () => {
+                await initializeStorageAndData();
+                await registerServiceWorker();
+                
+                // Auto-backup reminder (weekly)
+                const lastBackup = localStorage.getItem('lastBackupReminder');
+                const now = Date.now();
+                const oneWeek = 7 * 24 * 60 * 60 * 1000;
+                
+                if (!lastBackup || (now - parseInt(lastBackup)) > oneWeek) {
+                    setTimeout(() => {
+                        if (Object.keys(entries).length > 0) {
+                            showMessage('💾 Muista viedä varmuuskopio iCloud Driveen!', 'info', 5000);
+                            localStorage.setItem('lastBackupReminder', now.toString());
+                        }
+                    }, 10000); // Show after 10 seconds
+                }
+            }, 100); // Small delay to let UI render first
+        }
+        
+        // Show loading for PWA mode
+        function showPWALoader() {
+            const loader = document.createElement('div');
+            loader.id = 'pwaLoader';
+            loader.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 10000; color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                flex-direction: column; gap: 20px;
+            `;
+            loader.innerHTML = `
+                <div style="font-size: 48px;">🍽️</div>
+                <div style="font-size: 18px; font-weight: 600;">Ruokapäiväkirja</div>
+                <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            `;
+            document.body.appendChild(loader);
+        }
+        
+        function hidePWALoader() {
+            const loader = document.getElementById('pwaLoader');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.3s';
+                setTimeout(() => loader.remove(), 300);
+            }
+        }
+        
+        // Synchronous date initialization (no async)
+        function initializeDateSync() {
+            try {
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const dateInput = document.getElementById('currentDate');
+                const weekdaySelect = document.getElementById('weekday');
+                
+                if (dateInput) dateInput.value = dateStr;
+                
+                const weekdays = ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'];
+                if (weekdaySelect) weekdaySelect.value = weekdays[now.getDay()];
+            } catch (e) {
+                console.error('Error initializing date:', e);
+            }
+        }
+        
+        // Separate storage and data loading
+        async function initializeStorageAndData() {
+            try {
+                console.log('Initializing storage and data...');
+                
+                // Detect and setup storage
+                const storage = checkStorageOptions();
+                console.log('Storage method:', storage);
+                
+                // Load existing data
+                await loadSavedData();
+                
+                // Load today's entries
+                loadTodaysEntries();
+                
+                // Update storage status in UI
+                updateStorageStatus(storage);
+                
+                console.log('Storage and data initialized successfully');
+            } catch (e) {
+                console.error('Error initializing storage and data:', e);
             }
         }
 
