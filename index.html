@@ -169,6 +169,22 @@
 
         .entry-form {
             padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .entry-form.editing {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 15px;
+            margin: 15px;
+            padding: 25px;
+        }
+
+        .entry-form.editing h2 {
+            color: #856404;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -1015,6 +1031,12 @@
             }
         }
         async function addEntry() {
+            // If in edit mode, call saveEditedEntry instead
+            if (editMode) {
+                await saveEditedEntry();
+                return;
+            }
+            
             try {
                 const btn = document.querySelector('button[onclick*="addEntry"]');
                 if (btn) {
@@ -1123,7 +1145,10 @@
                             <div class="entry-value">${entry.symptoms}</div>
                         </div>` : ''}
                     </div>
-                    <button class="btn btn-danger" style="margin-top: 12px; padding: 8px 16px; font-size: 14px;" onclick="deleteEntry('${date}', ${index})">🗑️ Poista merkintä</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button class="btn" style="background: #17a2b8; padding: 8px 16px; font-size: 14px; flex: 1;" onclick="editEntry('${date}', ${index})">✏️ Muokkaa</button>
+                        <button class="btn btn-danger" style="padding: 8px 16px; font-size: 14px; flex: 1;" onclick="deleteEntry('${date}', ${index})">🗑️ Poista</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1137,6 +1162,187 @@
                 }
                 saveEntries();
                 loadTodaysEntries();
+            }
+        }
+
+        // Edit mode variables
+        let editMode = false;
+        let editingDate = null;
+        let editingIndex = null;
+
+        // Edit entry
+        function editEntry(date, index) {
+            const entry = entries[date][index];
+            
+            // Set edit mode
+            editMode = true;
+            editingDate = date;
+            editingIndex = index;
+            
+            // Populate form with existing data
+            document.getElementById('mealTime').value = entry.time;
+            document.getElementById('location').value = entry.location;
+            document.getElementById('hungerBefore').value = entry.hungerBefore || '';
+            document.getElementById('fullnessAfter').value = entry.fullnessAfter || '';
+            document.getElementById('feelings').value = entry.feelings || '';
+            document.getElementById('symptoms').value = entry.symptoms || '';
+            
+            // Populate food table
+            populateFoodTable(entry.foods, entry.amounts);
+            
+            // Update form header and button
+            updateFormForEdit();
+            
+            // Scroll to form
+            document.querySelector('.entry-form').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Populate food table with existing data
+        function populateFoodTable(foods, amounts) {
+            // Clear existing rows except header
+            const foodTable = document.getElementById('foodTable');
+            const existingRows = foodTable.querySelectorAll('.food-row');
+            for (let i = existingRows.length - 1; i > 0; i--) {
+                existingRows[i].remove();
+            }
+            
+            // Convert foods and amounts to arrays if needed
+            const foodArray = Array.isArray(foods) ? foods : (foods || '').toString().split('\n').filter(f => f.trim());
+            const amountArray = Array.isArray(amounts) ? amounts : (amounts || '').toString().split('\n').filter(a => a.trim());
+            
+            // Add rows for each food item
+            for (let i = 0; i < Math.max(foodArray.length, 1); i++) {
+                const newRow = document.createElement('div');
+                newRow.className = 'food-row';
+                newRow.innerHTML = `
+                    <input type="text" class="food-input" placeholder="esim. LIHAPULLAT" value="${foodArray[i] || ''}">
+                    <input type="text" class="amount-input" placeholder="esim. 5 isoa" value="${amountArray[i] || ''}">
+                    <button type="button" class="remove-btn" onclick="removeFoodRow(this)">×</button>
+                `;
+                foodTable.appendChild(newRow);
+            }
+        }
+
+        // Update form for edit mode
+        function updateFormForEdit() {
+            const entryForm = document.querySelector('.entry-form');
+            const formHeader = document.querySelector('.entry-form h2');
+            const submitBtn = document.querySelector('.entry-form .btn[onclick*="addEntry"]');
+            
+            // Add editing visual style
+            if (entryForm) {
+                entryForm.classList.add('editing');
+            }
+            
+            if (formHeader) {
+                formHeader.innerHTML = '✏️ Muokkaa ruokailua';
+            }
+            
+            if (submitBtn) {
+                submitBtn.innerHTML = 'Tallenna muutokset';
+                submitBtn.onclick = function() { saveEditedEntry(); };
+            }
+            
+            // Add cancel button if it doesn't exist
+            if (!document.getElementById('cancelEditBtn')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'cancelEditBtn';
+                cancelBtn.className = 'btn btn-secondary';
+                cancelBtn.innerHTML = 'Peruuta muokkaus';
+                cancelBtn.onclick = cancelEdit;
+                submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling);
+            }
+        }
+
+        // Save edited entry
+        async function saveEditedEntry() {
+            try {
+                const btn = document.querySelector('button[onclick*="saveEditedEntry"]');
+                if (btn) {
+                    btn.classList.add('loading');
+                    btn.disabled = true;
+                }
+                
+                const time = document.getElementById('mealTime').value;
+                const location = document.getElementById('location').value;
+                const { foods, amounts } = getFoodsFromTable();
+                const hungerBefore = document.getElementById('hungerBefore').value;
+                const fullnessAfter = document.getElementById('fullnessAfter').value;
+                const feelings = document.getElementById('feelings').value;
+                const symptoms = document.getElementById('symptoms').value;
+
+                if (!time || !location || foods.length === 0) {
+                    showMessage('Täytä ainakin aika, paikka ja vähintään yksi ruoka', 'error');
+                    return;
+                }
+
+                // Update the existing entry
+                const updatedEntry = {
+                    time,
+                    location,
+                    foods,
+                    amounts,
+                    hungerBefore,
+                    fullnessAfter,
+                    feelings,
+                    symptoms,
+                    timestamp: entries[editingDate][editingIndex].timestamp // Keep original timestamp
+                };
+
+                entries[editingDate][editingIndex] = updatedEntry;
+                await saveEntries();
+                loadTodaysEntries();
+                cancelEdit();
+                
+                showMessage('Merkintä päivitetty onnistuneesti!', 'success');
+                
+            } catch (error) {
+                console.error('Error saving edited entry:', error);
+                showMessage('Virhe tallentaessa muutoksia: ' + error.message, 'error');
+            } finally {
+                const btn = document.querySelector('button[onclick*="saveEditedEntry"]');
+                if (btn) {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Cancel edit mode
+        function cancelEdit() {
+            editMode = false;
+            editingDate = null;
+            editingIndex = null;
+            
+            // Reset form
+            clearForm();
+            
+            // Remove editing visual style
+            const entryForm = document.querySelector('.entry-form');
+            if (entryForm) {
+                entryForm.classList.remove('editing');
+            }
+            
+            // Reset form header and button
+            const formHeader = document.querySelector('.entry-form h2');
+            const submitBtn = document.querySelector('.entry-form .btn[onclick*="saveEditedEntry"]');
+            
+            if (formHeader) {
+                formHeader.innerHTML = 'Lisää ruokailu';
+            }
+            
+            if (submitBtn) {
+                submitBtn.innerHTML = 'Lisää merkintä';
+                submitBtn.onclick = function() { addEntry(); };
+            }
+            
+            // Remove cancel button
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            if (cancelBtn) {
+                cancelBtn.remove();
             }
         }
 
