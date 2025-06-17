@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ruokapäiväkirja">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Ruokapäiväkirja</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJ2ZXJzaW9uIjoiMS4wIiwibmFtZSI6IlJ1b2thcMOkaXbDpGtpcmphIiwic2hvcnRfbmFtZSI6IlJ1b2thbG9naSIsImRlc2NyaXB0aW9uIjoiSGVua2nDtmtvaHRhaW5lbiBydW9rYXDDpGl2w6RraXJqYSIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzY2N2VlYSIsInRoZW1lX2NvbG9yIjoiIzRDQUY1MCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBNE1EZ2dPREE0SWlCbWFXeHNQU0lqTkVOQlJqVXdJajQ4ZEdWNGRDQjRQU0kzTVNJZ2VUMGlOamtpSUdacGJHdzlJaU0yTmpZaUlHWnZiblF0YzJsNlpUMGlOelZsZVNJZ2RHVjRkQzFoYm1Ob2IzSTlJbTFwWkdSc1pTSStVblZ2YTJGd1c2UjVzTVdpcWFwc1p5NDRQQ3gwWlhoMFBpd3ZkR1Y0ZEQ0OEwzTjJaejQ9IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjgwOHg4MDgifV19">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDggODA4IiBmaWxsPSIjNENBRjUwIj48dGV4dCB4PSI3MSIgeT0iNjkiIGZpbGw9IiM2NjYiIGZvbnQtc2l6ZT0iNzVleSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UnVva2FwW6R5c1decWphPC90ZXh0Pjwvc3ZnPg==">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: env(safe-area-inset-top, 10px) env(safe-area-inset-right, 10px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 10px);
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            touch-action: manipulation;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 20px);
+            min-height: calc(-webkit-fill-available - 20px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .install-banner {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            margin: 10px -20px -10px -20px;
+            text-align: left;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border-radius: 0;
+        }
+
+        .install-banner button {
+            background: white;
+            color: #4CAF50;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .date-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 84px;
+            z-index: 90;
+        }
+
+        .date-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .date-row label {
+            font-weight: 600;
+            min-width: 90px;
+            font-size: 14px;
+        }
+
+        .date-row input, .date-row select {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 44px;
+        }
+
+        .date-row select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .hunger-scale {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .hunger-scale h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .scale-items {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .scale-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+        }
+
+        .scale-number {
+            background: #ffc107;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .entry-form {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: white;
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 48px;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 54px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover, .btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .btn-secondary:hover, .btn-secondary:focus {
+            box-shadow: 0 8px 16px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-danger:hover, .btn-danger:focus {
+            box-shadow: 0 8px 16px rgba(220, 53, 69, 0.3);
+        }
+
+        .loading {
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .entries {
+            padding: 20px;
+        }
+
+        .entry {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .entry-time {
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .entry-details {
+            display: grid;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .entry-detail {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .entry-label {
+            font-weight: 600;
+            min-width: 70px;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .entry-value {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .quick-add {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quick-btn {
+            padding: 12px 16px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+            font-weight: 500;
+        }
+
+        .quick-btn:hover, .quick-btn:focus {
+            background: #4CAF50;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .quick-btn:active {
+            transform: translateY(0);
+        }
+
+        .food-table {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .food-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .food-row:first-child {
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .food-row input {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 44px;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .add-food-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+            min-height: 44px;
+            font-weight: 500;
+        }
+
+        .export-section {
+            background: #e3f2fd;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .export-section h3 {
+            margin-bottom: 12px;
+            color: #1976d2;
+        }
+
+        .export-section p {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        .export-buttons {
+            display: grid;
+            gap: 12px;
+        }
+
+        .no-entries {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        .success-message, .error-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            z-index: 1000;
+            max-width: 90%;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .error-message {
+            background: #dc3545;
+            color: white;
+        }
+
+        .info-message {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .success-message.show, .error-message.show, .info-message.show {
+            opacity: 1;
+        }
+
+        /* iOS specific improvements */
+        @supports (-webkit-touch-callout: none) {
+            .container {
+                min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px);
+            }
+            
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .date-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .date-row label {
+                min-width: auto;
+                font-size: 13px;
+            }
+            
+            .scale-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .food-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .food-row:first-child {
+                display: none; /* Hide headers on mobile */
+            }
+            
+            .food-row input {
+                margin-bottom: 4px;
+            }
+            
+            .remove-btn {
+                justify-self: end;
+                width: 32px;
+                height: 32px;
+            }
+            
+            .entry-detail {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .entry-label {
+                min-width: auto;
+                font-size: 13px;
+            }
+            
+            .quick-add {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 320px) {
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            }
+            
+            .container {
+                background: #1a1a1a;
+                color: #ffffff;
+            }
+            
+            .date-info, .entry, .food-table {
+                background: #2d2d2d;
+                color: #ffffff;
+            }
+            
+            .form-group input, .form-group select, .form-group textarea {
+                background: #2d2d2d;
+                border-color: #404040;
+                color: #ffffff;
+            }
+            
+            .quick-btn {
+                background: #404040;
+                color: #ffffff;
+            }
+            
+            .entry-label {
+                color: #cccccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Ruokapäiväkirja</h1>
+            <div class="install-banner" id="installBanner">
+                <span>📱 Asenna sovellus kotiruutuun</span>
+                <button onclick="installApp()">Asenna</button>
+            </div>
+        </div>
+
+        <div class="date-info">
+            <div class="date-row">
+                <label>Päivämäärä:</label>
+                <input type="date" id="currentDate">
+            </div>
+            <div class="date-row">
+                <label>Viikonpäivä:</label>
+                <select id="weekday">
+                    <option value="Maanantai">Maanantai</option>
+                    <option value="Tiistai">Tiistai</option>
+                    <option value="Keskiviikko">Keskiviikko</option>
+                    <option value="Torstai">Torstai</option>
+                    <option value="Perjantai">Perjantai</option>
+                    <option value="Lauantai">Lauantai</option>
+                    <option value="Sunnuntai">Sunnuntai</option>
+                </select>
+            </div>
+            <div class="date-row">
+                <label>Päivän tyyppi:</label>
+                <select id="dayType">
+                    <option value="Tavallinen">Tavallinen</option>
+                    <option value="Poikkeava">Poikkeava</option>
+                </select>
+            </div>
+            <div class="date-row" id="specialNote" style="display: none;">
+                <label>Miten poikkeava:</label>
+                <input type="text" id="specialNoteText" placeholder="Kerro miten päivä poikkeaa">
+            </div>
+        </div>
+
+        <div class="hunger-scale">
+            <h3>Nälän ja kylläisyyden mittari</h3>
+            <div class="scale-items">
+                <div class="scale-item">
+                    <div class="scale-number">1</div>
+                    <span>Niin nälkä, että heikottaa</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">2</div>
+                    <span>Pitää saada heti jotakin syötävää</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">3</div>
+                    <span>Nälkä, kiire päästä syömään</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">4</div>
+                    <span>Pieni nälkä, ei kiirettä syömään</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">5</div>
+                    <span>Tekee mieli syödä</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">6</div>
+                    <span>Ei tee enää mieli syödä</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">7</div>
+                    <span>Nälänntume on poissa</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">8</div>
+                    <span>Vatsa on täynnyt</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">9</div>
+                    <span>Vatsa on lieman täysi</span>
+                </div>
+                <div class="scale-item">
+                    <div class="scale-number">10</div>
+                    <span>Ähky</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="entry-form">
+            <h2>Lisää ruokailu</h2>
+            
+            <div class="quick-add">
+                <button class="quick-btn" onclick="setCurrentTime()">Nyt</button>
+                <button class="quick-btn" onclick="quickFill('Koti')">Koti</button>
+                <button class="quick-btn" onclick="quickFill('Koulu')">Koulu</button>
+                <button class="quick-btn" onclick="quickFill('Työpaikka')">Työpaikka</button>
+                <button class="quick-btn" onclick="quickFill('Ravintola')">Ravintola</button>
+            </div>
+
+            <div class="form-group">
+                <label>Aika (klo)</label>
+                <input type="time" id="mealTime">
+            </div>
+
+            <div class="form-group">
+                <label>Paikka</label>
+                <input type="text" id="location" placeholder="esim. koti, koulu, ravintola">
+            </div>
+
+            <div class="form-group">
+                <label>Ruuat ja juomat</label>
+                <div class="food-table" id="foodTable">
+                    <div class="food-row">
+                        <div>Ruoka/Juoma</div>
+                        <div>Määrä</div>
+                        <div></div>
+                    </div>
+                    <div class="food-row">
+                        <input type="text" class="food-input" placeholder="esim. LIHAPULLAT">
+                        <input type="text" class="amount-input" placeholder="esim. 5 isoa">
+                        <button type="button" class="remove-btn" onclick="removeFoodRow(this)">×</button>
+                    </div>
+                </div>
+                <button type="button" class="add-food-btn" onclick="addFoodRow()">+ Lisää ruoka</button>
+            </div>
+
+            <div class="form-group">
+                <label>Nälän aste ennen ruokailua (1-10)</label>
+                <select id="hungerBefore">
+                    <option value="">Valitse</option>
+                    <option value="1">1 - Niin nälkä, että heikottaa</option>
+                    <option value="2">2 - Pitää saada heti jotakin syötävää</option>
+                    <option value="3">3 - Nälkä, kiire päästä syömään</option>
+                    <option value="4">4 - Pieni nälkä, ei kiirettä syömään</option>
+                    <option value="5">5 - Tekee mieli syödä</option>
+                    <option value="6">6 - Ei tee enää mieli syödä</option>
+                    <option value="7">7 - Nälänntume on poissa</option>
+                    <option value="8">8 - Vatsa on täynnyt</option>
+                    <option value="9">9 - Vatsa on lieman täysi</option>
+                    <option value="10">10 - Ähky</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Kylläisyys ruokailun jälkeen (1-10)</label>
+                <select id="fullnessAfter">
+                    <option value="">Valitse</option>
+                    <option value="1">1 - Niin nälkä, että heikottaa</option>
+                    <option value="2">2 - Pitää saada heti jotakin syötävää</option>
+                    <option value="3">3 - Nälkä, kiire päästä syömään</option>
+                    <option value="4">4 - Pieni nälkä, ei kiirettä syömään</option>
+                    <option value="5">5 - Tekee mieli syödä</option>
+                    <option value="6">6 - Ei tee enää mieli syödä</option>
+                    <option value="7">7 - Nälänntume on poissa</option>
+                    <option value="8">8 - Vatsa on täynnyt</option>
+                    <option value="9">9 - Vatsa on lieman täysi</option>
+                    <option value="10">10 - Ähky</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Tunteet ja tuntemukset</label>
+                <textarea id="feelings" placeholder="esim. ärtymys, tuli syötyä liikaa, ei erityisiä tunteita"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Oireet</label>
+                <textarea id="symptoms" placeholder="esim. vatsakipu, turvotus, ihottuma, päänsärky"></textarea>
+            </div>
+
+            <button class="btn" onclick="console.log('Button clicked!'); addEntry();">Lisää merkintä</button>
+        </div>
+
+        <div class="entries">
+            <h2>Päivän merkinnät</h2>
+            <div id="entriesList">
+                <div class="no-entries">Ei vielä merkintöjä tälle päivälle</div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3>📤 Vie tiedot</h3>
+            <p>Vie tiedot iCloud Driveen tai muihin sovelluksiin<br>
+            <small style="color: #666;">Ladataan tallennustilan tila...</small></p>
+            <div class="export-buttons">
+                <button class="btn btn-secondary" onclick="exportDay()">📋 Lataa päivän merkinnät (CSV)</button>
+                <button class="btn btn-secondary" onclick="exportAll()">📊 Lataa kaikki merkinnät (CSV)</button>
+                <button class="btn" onclick="exportBackup()" style="background: #17a2b8;">💾 Varmuuskopioi kaikki (JSON)</button>
+                <button class="btn" onclick="importBackup()" style="background: #6f42c1;">📥 Tuo varmuuskopio</button>
+                <button class="btn btn-danger" onclick="clearDay()">🗑️ Tyhjennä päivä</button>
+            </div>
+            <input type="file" id="backupFile" accept=".json" style="display: none;" onchange="handleFileImport(this)">
+        </div>
+    </div>
+
+    <script>
+        // Initialize app with multiple storage options
+        let entries = {};
+        let storageType = 'none'; // 'localStorage', 'indexedDB', or 'none'
+        
+        // Check storage availability
+        function checkStorageOptions() {
+            // Try localStorage first
+            try {
+                const test = '__storage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                storageType = 'localStorage';
+                console.log('✅ localStorage available');
+                return 'localStorage';
+            } catch (e) {
+                console.log('❌ localStorage blocked');
+            }
+            
+            // Try IndexedDB as fallback
+            if (window.indexedDB) {
+                storageType = 'indexedDB';
+                console.log('✅ IndexedDB available as fallback');
+                return 'indexedDB';
+            }
+            
+            console.log('⚠️ No persistent storage available - using memory only');
+            storageType = 'none';
+            return 'none';
+        }
+        
+        // IndexedDB helper functions
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('FoodDiaryDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('entries')) {
+                        db.createObjectStore('entries', { keyPath: 'date' });
+                    }
+                };
+            });
+        }
+        
+        async function saveToIndexedDB() {
+            try {
+                const db = await openDB();
+                const transaction = db.transaction(['entries'], 'readwrite');
+                const store = transaction.objectStore('entries');
+                
+                // Save each date's entries
+                for (const [date, dateEntries] of Object.entries(entries)) {
+                    await store.put({ date, entries: dateEntries });
+                }
+                
+                console.log('✅ Data saved to IndexedDB');
+            } catch (e) {
+                console.error('❌ IndexedDB save failed:', e);
+            }
+        }
+        
+        async function loadFromIndexedDB() {
+            try {
+                const db = await openDB();
+                const transaction = db.transaction(['entries'], 'readonly');
+                const store = transaction.objectStore('entries');
+                const request = store.getAll();
+                
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => {
+                        const result = {};
+                        request.result.forEach(item => {
+                            result[item.date] = item.entries;
+                        });
+                        entries = result;
+                        console.log('✅ Data loaded from IndexedDB');
+                        resolve(result);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (e) {
+                console.error('❌ IndexedDB load failed:', e);
+                return {};
+            }
+        }
+        
+        // Universal save function
+        async function saveEntries() {
+            try {
+                switch (storageType) {
+                    case 'localStorage':
+                        localStorage.setItem('foodDiaryEntries', JSON.stringify(entries));
+                        console.log('✅ Saved to localStorage');
+                        break;
+                    case 'indexedDB':
+                        await saveToIndexedDB();
+                        break;
+                    case 'none':
+                        console.log('⚠️ Memory-only mode: data will be lost on page reload');
+                        break;
+                }
+            } catch (e) {
+                console.error('❌ Save failed:', e);
+                // Auto-export as backup if save fails
+                autoBackupExport();
+            }
+        }
+        
+        // Universal load function
+        async function loadSavedData() {
+            try {
+                switch (storageType) {
+                    case 'localStorage':
+                        const saved = localStorage.getItem('foodDiaryEntries');
+                        if (saved) {
+                            entries = JSON.parse(saved);
+                            console.log('✅ Loaded from localStorage');
+                        }
+                        break;
+                    case 'indexedDB':
+                        await loadFromIndexedDB();
+                        break;
+                    case 'none':
+                        entries = {};
+                        break;
+                }
+            } catch (e) {
+                console.error('❌ Load failed:', e);
+                entries = {};
+            }
+        }
+        
+        // Auto-backup export when storage fails
+        function autoBackupExport() {
+            try {
+                const dateStr = new Date().toISOString().split('T')[0];
+                const backupData = JSON.stringify(entries, null, 2);
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(backupData));
+                element.setAttribute('download', `ruokapaivakirja_varmuuskopio_${dateStr}.json`);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                
+                alert('Automaattinen varmuuskopio ladattu! Tallenna tiedosto turvalliseen paikkaan.');
+            } catch (e) {
+                console.error('Auto-backup failed:', e);
+            }
+        }
+        
+        // Set current date and weekday
+        function initializeDate() {
+            try {
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const dateInput = document.getElementById('currentDate');
+                const weekdaySelect = document.getElementById('weekday');
+                
+                if (dateInput) dateInput.value = dateStr;
+                
+                const weekdays = ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'];
+                if (weekdaySelect) weekdaySelect.value = weekdays[now.getDay()];
+                
+                loadTodaysEntries();
+            } catch (e) {
+                console.error('Error initializing date:', e);
+            }
+        }
+
+        // Set current time
+        function setCurrentTime() {
+            try {
+                const now = new Date();
+                const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
+                const timeInput = document.getElementById('mealTime');
+                if (timeInput) timeInput.value = timeStr;
+            } catch (e) {
+                console.error('Error setting time:', e);
+            }
+        }
+
+        // Quick fill location
+        function quickFill(location) {
+            try {
+                const locationInput = document.getElementById('location');
+                if (locationInput) locationInput.value = location;
+            } catch (e) {
+                console.error('Error filling location:', e);
+            }
+        }
+
+        // Add food row
+        function addFoodRow() {
+            try {
+                const foodTable = document.getElementById('foodTable');
+                if (!foodTable) return;
+                
+                const newRow = document.createElement('div');
+                newRow.className = 'food-row';
+                newRow.innerHTML = `
+                    <input type="text" class="food-input" placeholder="esim. LIHAPULLAT">
+                    <input type="text" class="amount-input" placeholder="esim. 5 isoa">
+                    <button type="button" class="remove-btn" onclick="removeFoodRow(this)">×</button>
+                `;
+                foodTable.appendChild(newRow);
+                
+                // Focus on the new food input
+                const newFoodInput = newRow.querySelector('.food-input');
+                if (newFoodInput) {
+                    newFoodInput.focus();
+                }
+            } catch (e) {
+                console.error('Error adding food row:', e);
+                showMessage('Virhe lisättäessä ruokariviä', 'error');
+            }
+        }
+
+        // Remove food row
+        function removeFoodRow(button) {
+            try {
+                const rows = document.querySelectorAll('.food-row');
+                if (rows.length > 2) { // Keep at least header + one row
+                    button.parentElement.remove();
+                }
+            } catch (e) {
+                console.error('Error removing food row:', e);
+            }
+        }
+
+        // Get foods and amounts from table
+        function getFoodsFromTable() {
+            try {
+                const foods = [];
+                const amounts = [];
+                const foodInputs = document.querySelectorAll('.food-input');
+                const amountInputs = document.querySelectorAll('.amount-input');
+                
+                for (let i = 0; i < foodInputs.length; i++) {
+                    const foodValue = foodInputs[i] ? foodInputs[i].value.trim() : '';
+                    if (foodValue) {
+                        foods.push(foodValue);
+                        amounts.push(amountInputs[i] ? amountInputs[i].value.trim() : '');
+                    }
+                }
+                
+                return { foods, amounts };
+            } catch (e) {
+                console.error('Error getting foods from table:', e);
+                return { foods: [], amounts: [] };
+            }
+        }
+
+        // Clear food table
+        function clearFoodTable() {
+            try {
+                const foodInputs = document.querySelectorAll('.food-input');
+                const amountInputs = document.querySelectorAll('.amount-input');
+                
+                foodInputs.forEach(input => {
+                    if (input) input.value = '';
+                });
+                amountInputs.forEach(input => {
+                    if (input) input.value = '';
+                });
+                
+                // Keep only one row
+                const rows = document.querySelectorAll('.food-row');
+                for (let i = rows.length - 1; i > 1; i--) {
+                    if (rows[i]) rows[i].remove();
+                }
+            } catch (e) {
+                console.error('Error clearing food table:', e);
+            }
+        }
+        async function addEntry() {
+            try {
+                const btn = document.querySelector('button[onclick*="addEntry"]');
+                if (btn) {
+                    btn.classList.add('loading');
+                    btn.disabled = true;
+                }
+                
+                const date = document.getElementById('currentDate').value;
+                const time = document.getElementById('mealTime').value;
+                const location = document.getElementById('location').value;
+                const { foods, amounts } = getFoodsFromTable();
+                const hungerBefore = document.getElementById('hungerBefore').value;
+                const fullnessAfter = document.getElementById('fullnessAfter').value;
+                const feelings = document.getElementById('feelings').value;
+                const symptoms = document.getElementById('symptoms').value;
+
+                if (!date || !time || !location || foods.length === 0) {
+                    showMessage('Täytä ainakin päivämäärä, aika, paikka ja vähintään yksi ruoka', 'error');
+                    return;
+                }
+
+                const entry = {
+                    time,
+                    location,
+                    foods,
+                    amounts,
+                    hungerBefore,
+                    fullnessAfter,
+                    feelings,
+                    symptoms,
+                    timestamp: Date.now()
+                };
+
+                if (!entries[date]) {
+                    entries[date] = [];
+                }
+
+                entries[date].push(entry);
+                await saveEntries();
+                loadTodaysEntries();
+                clearForm();
+                
+                showMessage('Merkintä lisätty onnistuneesti!', 'success');
+                
+                // Scroll to entries section
+                document.querySelector('.entries').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+            } catch (error) {
+                console.error('Error adding entry:', error);
+                showMessage('Virhe merkintää lisätessä: ' + error.message, 'error');
+            } finally {
+                const btn = document.querySelector('button[onclick*="addEntry"]');
+                if (btn) {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Save entries to localStorage
+        function saveEntries() {
+            localStorage.setItem('foodDiaryEntries', JSON.stringify(entries));
+        }
+
+        // Load today's entries
+        function loadTodaysEntries() {
+            const date = document.getElementById('currentDate').value;
+            const entriesList = document.getElementById('entriesList');
+            
+            if (!entries[date] || entries[date].length === 0) {
+                entriesList.innerHTML = '<div class="no-entries">Ei vielä merkintöjä tälle päivälle</div>';
+                return;
+            }
+
+            const sortedEntries = entries[date].sort((a, b) => a.time.localeCompare(b.time));
+            
+            entriesList.innerHTML = sortedEntries.map((entry, index) => `
+                <div class="entry">
+                    <div class="entry-time">🕐 ${entry.time} - 📍 ${entry.location}</div>
+                    <div class="entry-details">
+                        <div class="entry-detail">
+                            <span class="entry-label">🍽️ Ruoat:</span>
+                            <div class="entry-value">${Array.isArray(entry.foods) ? entry.foods.join(', ') : (entry.foods || '').replace(/\n/g, ', ')}</div>
+                        </div>
+                        <div class="entry-detail">
+                            <span class="entry-label">📏 Määrät:</span>
+                            <div class="entry-value">${Array.isArray(entry.amounts) ? entry.amounts.join(', ') : (entry.amounts || '').replace(/\n/g, ', ')}</div>
+                        </div>
+                        ${entry.hungerBefore ? `<div class="entry-detail">
+                            <span class="entry-label">😋 Nälkä:</span>
+                            <div class="entry-value">${entry.hungerBefore}/10</div>
+                        </div>` : ''}
+                        ${entry.fullnessAfter ? `<div class="entry-detail">
+                            <span class="entry-label">😌 Kylläisyys:</span>
+                            <div class="entry-value">${entry.fullnessAfter}/10</div>
+                        </div>` : ''}
+                        ${entry.feelings ? `<div class="entry-detail">
+                            <span class="entry-label">💭 Tunteet:</span>
+                            <div class="entry-value">${entry.feelings}</div>
+                        </div>` : ''}
+                        ${entry.symptoms ? `<div class="entry-detail">
+                            <span class="entry-label">⚕️ Oireet:</span>
+                            <div class="entry-value">${entry.symptoms}</div>
+                        </div>` : ''}
+                    </div>
+                    <button class="btn btn-danger" style="margin-top: 12px; padding: 8px 16px; font-size: 14px;" onclick="deleteEntry('${date}', ${index})">🗑️ Poista merkintä</button>
+                </div>
+            `).join('');
+        }
+
+        // Delete entry
+        function deleteEntry(date, index) {
+            if (confirm('Haluatko varmasti poistaa tämän merkinnän?')) {
+                entries[date].splice(index, 1);
+                if (entries[date].length === 0) {
+                    delete entries[date];
+                }
+                saveEntries();
+                loadTodaysEntries();
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('mealTime').value = '';
+            document.getElementById('location').value = '';
+            clearFoodTable();
+            document.getElementById('hungerBefore').value = '';
+            document.getElementById('fullnessAfter').value = '';
+            document.getElementById('feelings').value = '';
+            document.getElementById('symptoms').value = '';
+        }
+
+        // Export day to CSV
+        function exportDay() {
+            try {
+                const date = document.getElementById('currentDate').value;
+                const weekday = document.getElementById('weekday').value;
+                const dayType = document.getElementById('dayType').value;
+                const specialNote = document.getElementById('specialNoteText').value;
+                
+                let csvContent = '';
+                
+                // Add header info
+                csvContent += `Päivämäärä,${date}\n`;
+                csvContent += `Viikonpäivä,${weekday}\n`;
+                csvContent += `Päivän tyyppi,${dayType}\n`;
+                if (specialNote) csvContent += `Poikkeava,${specialNote}\n`;
+                csvContent += '\n';
+                
+                // CSV headers
+                csvContent += 'Aika,Paikka,Ruoka/Juoma,Määrä,Nälkä ennen,Kylläisyys jälkeen,Tunteet,Oireet\n';
+                
+                if (entries[date]) {
+                    const sortedEntries = entries[date].sort((a, b) => a.time.localeCompare(b.time));
+                    sortedEntries.forEach(entry => {
+                        const foods = Array.isArray(entry.foods) ? entry.foods : (entry.foods || '').toString().split('\n').filter(f => f.trim());
+                        const amounts = Array.isArray(entry.amounts) ? entry.amounts : (entry.amounts || '').toString().split('\n').filter(a => a.trim());
+                        
+                        // Ensure we have at least one food item
+                        if (foods.length === 0) foods.push('');
+                        
+                        foods.forEach((food, i) => {
+                            const amount = amounts[i] || '';
+                            const row = [
+                                i === 0 ? entry.time : '',
+                                i === 0 ? entry.location : '',
+                                `"${food.trim()}"`,
+                                `"${amount.trim()}"`,
+                                i === 0 ? (entry.hungerBefore || '') : '',
+                                i === 0 ? (entry.fullnessAfter || '') : '',
+                                i === 0 ? `"${entry.feelings || ''}"` : '',
+                                i === 0 ? `"${entry.symptoms || ''}"` : ''
+                            ];
+                            csvContent += row.join(',') + '\n';
+                        });
+                    });
+                }
+                
+                downloadCSV(`ruokapaivakirja_${date}.csv`, csvContent);
+            } catch (e) {
+                console.error('Error exporting day:', e);
+                alert('Virhe viedessä tietoja. Yritä uudelleen.');
+            }
+        }
+
+        // Export all to CSV
+        function exportAll() {
+            try {
+                let csvContent = 'Päivämäärä,Viikonpäivä,Aika,Paikka,Ruoka/Juoma,Määrä,Nälkä ennen,Kylläisyys jälkeen,Tunteet,Oireet\n';
+                
+                Object.keys(entries).sort().forEach(date => {
+                    const sortedEntries = entries[date].sort((a, b) => a.time.localeCompare(b.time));
+                    
+                    sortedEntries.forEach(entry => {
+                        const foods = Array.isArray(entry.foods) ? entry.foods : (entry.foods || '').toString().split('\n').filter(f => f.trim());
+                        const amounts = Array.isArray(entry.amounts) ? entry.amounts : (entry.amounts || '').toString().split('\n').filter(a => a.trim());
+                        
+                        // Ensure we have at least one food item
+                        if (foods.length === 0) foods.push('');
+                        
+                        foods.forEach((food, i) => {
+                            const amount = amounts[i] || '';
+                            const row = [
+                                i === 0 ? date : '',
+                                i === 0 ? '' : '', // weekday not stored in old format
+                                i === 0 ? entry.time : '',
+                                i === 0 ? entry.location : '',
+                                `"${food.trim()}"`,
+                                `"${amount.trim()}"`,
+                                i === 0 ? (entry.hungerBefore || '') : '',
+                                i === 0 ? (entry.fullnessAfter || '') : '',
+                                i === 0 ? `"${entry.feelings || ''}"` : '',
+                                i === 0 ? `"${entry.symptoms || ''}"` : ''
+                            ];
+                            csvContent += row.join(',') + '\n';
+                        });
+                    });
+                });
+                
+                downloadCSV('ruokapaivakirja_kaikki.csv', csvContent);
+            } catch (e) {
+                console.error('Error exporting all:', e);
+                alert('Virhe viedessä tietoja. Yritä uudelleen.');
+            }
+        }
+
+        // Download CSV file
+        function downloadCSV(filename, csvContent) {
+            try {
+                const BOM = '\uFEFF'; // Add BOM for proper Excel encoding
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(BOM + csvContent));
+                element.setAttribute('download', filename);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            } catch (e) {
+                console.error('Error downloading CSV:', e);
+                alert('Virhe latauksen aikana. Yritä uudelleen.');
+            }
+        }
+
+        // Backup and restore functions
+        function exportBackup() {
+            try {
+                const backupData = {
+                    version: '1.0',
+                    exportDate: new Date().toISOString(),
+                    entries: entries
+                };
+                
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr));
+                element.setAttribute('download', `ruokapaivakirja_varmuuskopio_${new Date().toISOString().split('T')[0]}.json`);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                
+                alert('Varmuuskopio ladattu! Tallenna tiedosto turvalliseen paikkaan.');
+            } catch (e) {
+                console.error('Backup export failed:', e);
+                alert('Varmuuskopion luominen epäonnistui: ' + e.message);
+            }
+        }
+        
+        function importBackup() {
+            document.getElementById('backupFile').click();
+        }
+        
+        async function handleFileImport(input) {
+            try {
+                const file = input.files[0];
+                if (!file) return;
+                
+                const text = await file.text();
+                const backupData = JSON.parse(text);
+                
+                if (backupData.entries) {
+                    if (confirm('Haluatko korvata nykyiset tiedot varmuuskopiolla? Tämä poistaa kaikki nykyiset merkinnät.')) {
+                        entries = backupData.entries;
+                        await saveEntries();
+                        loadTodaysEntries();
+                        alert('Varmuuskopio tuotu onnistuneesti!');
+                    }
+                } else {
+                    alert('Virheellinen varmuuskopiotiedosto.');
+                }
+            } catch (e) {
+                console.error('Import failed:', e);
+                alert('Varmuuskopion tuominen epäonnistui: ' + e.message);
+            }
+            
+            // Reset file input
+            input.value = '';
+        }
+
+        // Event listeners and initialization
+        function setupEventListeners() {
+            try {
+                const dayTypeSelect = document.getElementById('dayType');
+                const dateInput = document.getElementById('currentDate');
+                
+                if (dayTypeSelect) {
+                    dayTypeSelect.addEventListener('change', function() {
+                        const specialNote = document.getElementById('specialNote');
+                        if (specialNote) {
+                            if (this.value === 'Poikkeava') {
+                                specialNote.style.display = 'flex';
+                            } else {
+                                specialNote.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+
+                if (dateInput) {
+                    dateInput.addEventListener('change', function() {
+                        try {
+                            const date = new Date(this.value);
+                            const weekdays = ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'];
+                            const weekdaySelect = document.getElementById('weekday');
+                            if (weekdaySelect) {
+                                weekdaySelect.value = weekdays[date.getDay()];
+                            }
+                            loadTodaysEntries();
+                        } catch (e) {
+                            console.error('Error handling date change:', e);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error setting up event listeners:', e);
+            }
+        }
+
+        // Initialize the application with storage detection
+        async function initializeApp() {
+            try {
+                console.log('Initializing food diary app...');
+                
+                // Detect and setup storage
+                const storage = checkStorageOptions();
+                console.log('Storage method:', storage);
+                
+                // Load existing data
+                await loadSavedData();
+                
+                // Setup UI
+                initializeDate();
+                setCurrentTime();
+                setupEventListeners();
+                
+                // Update storage status in UI
+                updateStorageStatus(storage);
+                
+                console.log('App initialized successfully with', storage, 'storage');
+            } catch (e) {
+                console.error('Error initializing app:', e);
+                alert('Sovelluksen lataus epäonnistui. Päivitä sivu ja yritä uudelleen.');
+            }
+        }
+        
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallBanner();
+        });
+        
+        function showInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner) {
+                banner.style.display = 'flex';
+            }
+        }
+        
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    showMessage('Sovellus asennettu onnistuneesti!', 'success');
+                }
+                deferredPrompt = null;
+                hideInstallBanner();
+            } else {
+                // For iOS Safari - show instructions
+                showMessage('iPhone: Jaa > Lisää kotiruutuun', 'info');
+            }
+        }
+        
+        function hideInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner) {
+                banner.style.display = 'none';
+            }
+        }
+        
+        // Enhanced message system
+        function showMessage(message, type = 'success', duration = 3000) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `${type}-message show`;
+            messageEl.textContent = message;
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+                setTimeout(() => {
+                    if (messageEl.parentNode) {
+                        messageEl.parentNode.removeChild(messageEl);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        // Update UI to show storage status
+        function updateStorageStatus(storage) {
+            const exportSection = document.querySelector('.export-section p');
+            if (exportSection) {
+                let statusText = 'Vie tiedot iCloud Driveen tai muihin sovelluksiin<br>';
+                switch (storage) {
+                    case 'localStorage':
+                        statusText += '<small style="color: #28a745;">✅ Tiedot tallennetaan pysyvästi laitteellesi</small>';
+                        break;
+                    case 'indexedDB':
+                        statusText += '<small style="color: #28a745;">✅ Tiedot tallennetaan IndexedDB:hen (pysyvä)</small>';
+                        break;
+                    case 'none':
+                        statusText += '<small style="color: #dc3545;">⚠️ Tiedot säilyvät vain istunnon ajan - muista viedä varmuuskopio!</small>';
+                        break;
+                }
+                exportSection.innerHTML = statusText;
+            }
+        }
+
+        // Clear day
+        function clearDay() {
+            try {
+                const date = document.getElementById('currentDate').value;
+                if (confirm(`Haluatko varmasti poistaa kaikki merkinnät päivältä ${date}?`)) {
+                    delete entries[date];
+                    saveEntries();
+                    loadTodaysEntries();
+                }
+            } catch (e) {
+                console.error('Error clearing day:', e);
+            }
+        }
+
+        // Service Worker registration for PWA support
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Simple service worker for basic caching
+                    const swCode = `
+                        const CACHE_NAME = 'ruokapaivakirja-v1';
+                        const urlsToCache = [
+                            '${window.location.pathname}',
+                            'data:application/json;base64,${btoa(JSON.stringify({
+                                name: 'Ruokapäiväkirja',
+                                short_name: 'Ruokalogi',
+                                display: 'standalone',
+                                background_color: '#667eea',
+                                theme_color: '#4CAF50'
+                            }))}'
+                        ];
+                        
+                        self.addEventListener('install', (event) => {
+                            event.waitUntil(
+                                caches.open(CACHE_NAME)
+                                    .then((cache) => cache.addAll(urlsToCache))
+                            );
+                        });
+                        
+                        self.addEventListener('fetch', (event) => {
+                            event.respondWith(
+                                caches.match(event.request)
+                                    .then((response) => {
+                                        return response || fetch(event.request);
+                                    }
+                                )
+                            );
+                        });
+                    `;
+                    
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    
+                    await navigator.serviceWorker.register(swUrl);
+                    console.log('✅ Service Worker registered successfully');
+                } catch (error) {
+                    console.log('❌ Service Worker registration failed:', error);
+                }
+            }
+        }
+
+        // Simple password protection
+        function checkPassword() {
+            let correctPassword = localStorage.getItem('foodDiaryPassword');
+            
+            // If no password set, ask user to set one
+            if (!correctPassword) {
+                correctPassword = prompt("🔒 Aseta salasana ruokapäiväkirjalle (muista tämä!):");
+                if (!correctPassword) {
+                    return false;
+                }
+                localStorage.setItem('foodDiaryPassword', correctPassword);
+                alert("✅ Salasana asetettu! Käytä tätä samaa salasanaa jatkossa.");
+                return true;
+            }
+            
+            const userPassword = localStorage.getItem('foodDiaryAuth');
+            
+            if (userPassword !== correctPassword) {
+                const password = prompt("🔒 Anna salasana päästäksesi ruokapäiväkirjaan:");
+                if (password === correctPassword) {
+                    localStorage.setItem('foodDiaryAuth', password);
+                    return true;
+                } else if (password !== null) {
+                    alert("❌ Väärä salasana!");
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Enhanced app initialization
+        async function fullInitialize() {
+            // Check password first
+            if (!checkPassword()) {
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;">🔒 Pääsy evätty</div>';
+                return;
+            }
+            
+            await initializeApp();
+            await registerServiceWorker();
+            
+            // Auto-backup reminder (weekly)
+            const lastBackup = localStorage.getItem('lastBackupReminder');
+            const now = Date.now();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            
+            if (!lastBackup || (now - parseInt(lastBackup)) > oneWeek) {
+                setTimeout(() => {
+                    if (Object.keys(entries).length > 0) {
+                        showMessage('💾 Muista viedä varmuuskopio iCloud Driveen!', 'info', 5000);
+                        localStorage.setItem('lastBackupReminder', now.toString());
+                    }
+                }, 10000); // Show after 10 seconds
+            }
+        }
+
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fullInitialize);
+        } else {
+            fullInitialize();
+        }
+    </script>
+</body>
+</html>
