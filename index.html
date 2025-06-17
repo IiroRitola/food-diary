@@ -1580,20 +1580,25 @@
                 return true;
             }
             
+            // Detect storage availability for password (independent check)
+            let passwordStorageAvailable = false;
+            try {
+                const test = '__password_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                passwordStorageAvailable = true;
+            } catch (e) {
+                passwordStorageAvailable = false;
+            }
+            
             // Try to load saved password
             if (!appPassword) {
                 try {
-                    switch (storageType) {
-                        case 'localStorage':
-                            appPassword = localStorage.getItem('foodDiaryPassword');
-                            break;
-                        case 'indexedDB':
-                            // For IndexedDB, we'll use memory for passwords (simpler)
-                            appPassword = sessionStorage.getItem('foodDiaryPassword');
-                            break;
-                        case 'none':
-                            // Memory only - will reset each session
-                            break;
+                    if (passwordStorageAvailable) {
+                        appPassword = localStorage.getItem('foodDiaryPassword');
+                    } else {
+                        // Use sessionStorage as fallback
+                        appPassword = sessionStorage.getItem('foodDiaryPassword');
                     }
                 } catch (e) {
                     console.log('Could not load saved password');
@@ -1609,14 +1614,12 @@
                 
                 // Try to save the password
                 try {
-                    switch (storageType) {
-                        case 'localStorage':
-                            localStorage.setItem('foodDiaryPassword', appPassword);
-                            break;
-                        case 'indexedDB':
-                        case 'none':
-                            sessionStorage.setItem('foodDiaryPassword', appPassword);
-                            break;
+                    if (passwordStorageAvailable) {
+                        localStorage.setItem('foodDiaryPassword', appPassword);
+                        console.log('✅ Password saved to localStorage');
+                    } else {
+                        sessionStorage.setItem('foodDiaryPassword', appPassword);
+                        console.log('✅ Password saved to sessionStorage');
                     }
                 } catch (e) {
                     console.log('Could not save password, using session only');
