@@ -1570,36 +1570,74 @@
             }
         }
 
-        // Simple password protection
+        // Simple password protection that works with any storage type
+        let appPassword = null;
+        let isAuthenticated = false;
+        
         function checkPassword() {
-            let correctPassword = localStorage.getItem('foodDiaryPassword');
-            
-            // If no password set, ask user to set one
-            if (!correctPassword) {
-                correctPassword = prompt("🔒 Aseta salasana ruokapäiväkirjalle (muista tämä!):");
-                if (!correctPassword) {
-                    return false;
-                }
-                localStorage.setItem('foodDiaryPassword', correctPassword);
-                alert("✅ Salasana asetettu! Käytä tätä samaa salasanaa jatkossa.");
+            // If already authenticated this session, allow access
+            if (isAuthenticated) {
                 return true;
             }
             
-            const userPassword = localStorage.getItem('foodDiaryAuth');
-            
-            if (userPassword !== correctPassword) {
-                const password = prompt("🔒 Anna salasana päästäksesi ruokapäiväkirjaan:");
-                if (password === correctPassword) {
-                    localStorage.setItem('foodDiaryAuth', password);
-                    return true;
-                } else if (password !== null) {
-                    alert("❌ Väärä salasana!");
-                    return false;
-                } else {
-                    return false;
+            // Try to load saved password
+            if (!appPassword) {
+                try {
+                    switch (storageType) {
+                        case 'localStorage':
+                            appPassword = localStorage.getItem('foodDiaryPassword');
+                            break;
+                        case 'indexedDB':
+                            // For IndexedDB, we'll use memory for passwords (simpler)
+                            appPassword = sessionStorage.getItem('foodDiaryPassword');
+                            break;
+                        case 'none':
+                            // Memory only - will reset each session
+                            break;
+                    }
+                } catch (e) {
+                    console.log('Could not load saved password');
                 }
             }
-            return true;
+            
+            // If no password set, ask user to set one
+            if (!appPassword) {
+                appPassword = prompt("🔒 Aseta salasana ruokapäiväkirjalle (muista tämä!):");
+                if (!appPassword) {
+                    return false;
+                }
+                
+                // Try to save the password
+                try {
+                    switch (storageType) {
+                        case 'localStorage':
+                            localStorage.setItem('foodDiaryPassword', appPassword);
+                            break;
+                        case 'indexedDB':
+                        case 'none':
+                            sessionStorage.setItem('foodDiaryPassword', appPassword);
+                            break;
+                    }
+                } catch (e) {
+                    console.log('Could not save password, using session only');
+                }
+                
+                alert("✅ Salasana asetettu! Käytä tätä samaa salasanaa jatkossa.");
+                isAuthenticated = true;
+                return true;
+            }
+            
+            // Ask for password
+            const password = prompt("🔒 Anna salasana päästäksesi ruokapäiväkirjaan:");
+            if (password === appPassword) {
+                isAuthenticated = true;
+                return true;
+            } else if (password !== null) {
+                alert("❌ Väärä salasana!");
+                return false;
+            } else {
+                return false;
+            }
         }
 
         // Enhanced app initialization
