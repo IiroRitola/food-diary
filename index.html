@@ -1753,78 +1753,7 @@
             }
         }
 
-        // Simple password protection that works with any storage type
-        let appPassword = null;
-        let isAuthenticated = false;
-        
-        function checkPassword() {
-            // If already authenticated this session, allow access
-            if (isAuthenticated) {
-                return true;
-            }
-            
-            // Detect storage availability for password (independent check)
-            let passwordStorageAvailable = false;
-            try {
-                const test = '__password_test__';
-                localStorage.setItem(test, test);
-                localStorage.removeItem(test);
-                passwordStorageAvailable = true;
-            } catch (e) {
-                passwordStorageAvailable = false;
-            }
-            
-            // Try to load saved password
-            if (!appPassword) {
-                try {
-                    if (passwordStorageAvailable) {
-                        appPassword = localStorage.getItem('foodDiaryPassword');
-                    } else {
-                        // Use sessionStorage as fallback
-                        appPassword = sessionStorage.getItem('foodDiaryPassword');
-                    }
-                } catch (e) {
-                    console.log('Could not load saved password');
-                }
-            }
-            
-            // If no password set, ask user to set one
-            if (!appPassword) {
-                appPassword = prompt("🔒 Aseta salasana ruokapäiväkirjalle (muista tämä!):");
-                if (!appPassword) {
-                    return false;
-                }
-                
-                // Try to save the password
-                try {
-                    if (passwordStorageAvailable) {
-                        localStorage.setItem('foodDiaryPassword', appPassword);
-                        console.log('✅ Password saved to localStorage');
-                    } else {
-                        sessionStorage.setItem('foodDiaryPassword', appPassword);
-                        console.log('✅ Password saved to sessionStorage');
-                    }
-                } catch (e) {
-                    console.log('Could not save password, using session only');
-                }
-                
-                alert("✅ Salasana asetettu! Käytä tätä samaa salasanaa jatkossa.");
-                isAuthenticated = true;
-                return true;
-            }
-            
-            // Ask for password
-            const password = prompt("🔒 Anna salasana päästäksesi ruokapäiväkirjaan:");
-            if (password === appPassword) {
-                isAuthenticated = true;
-                return true;
-            } else if (password !== null) {
-                alert("❌ Väärä salasana!");
-                return false;
-            } else {
-                return false;
-            }
-        }
+
 
         // Enhanced app initialization with PWA performance optimizations
         async function fullInitialize() {
@@ -1833,12 +1762,6 @@
             
             if (isPWA) {
                 showPWALoader();
-            }
-            
-            // Check password first
-            if (!checkPassword()) {
-                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;">🔒 Pääsy evätty</div>';
-                return;
             }
             
             // Fast UI initialization first
